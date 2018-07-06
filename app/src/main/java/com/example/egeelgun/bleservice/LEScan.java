@@ -43,6 +43,7 @@ public class LEScan extends ListActivity {
     private Handler bHandler;
 
     public void scanDevice(final boolean enable) {
+        bHandler = new Handler();
         final BluetoothLeScanner leScanner = bAdapter.getBluetoothLeScanner();
         if(enable) {
             bHandler.postDelayed(new Runnable() {
@@ -50,6 +51,7 @@ public class LEScan extends ListActivity {
                 public void run() {
                     mScan = false;
                     leScanner.stopScan(bScanCallBack);
+                    invalidateOptionsMenu();
                 }
             }, scanLETime);
             mScan = true;
@@ -58,6 +60,7 @@ public class LEScan extends ListActivity {
             mScan = false;
             leScanner.stopScan(bScanCallBack);
         }
+        invalidateOptionsMenu();
     }
     private class LEDeviceList extends BaseAdapter {
         private ArrayList<BluetoothDevice> bDeviceList;
@@ -68,48 +71,74 @@ public class LEScan extends ListActivity {
             bDeviceList = new ArrayList<>();
             bInflater = LEScan.this.getLayoutInflater();
         }
+
         public void addDevice(BluetoothDevice device) {
-            if(bDeviceList.contains(device)) {
+            if (bDeviceList.contains(device)) {
                 bDeviceList.add(device);
             }
         }
+
         public BluetoothDevice getDevice(int index) {
             return bDeviceList.get(index);
         }
+
         public void clear() {
             bDeviceList.clear();
         }
+
         @Override
         public int getCount() {
             return bDeviceList.size();
         }
+
         @Override
         public Object getItem(int i) {
             return bDeviceList.get(i);
         }
+
         @Override
         public long getItemId(int o) {
             return o;
         }
 
         public View getView(int i, View view, ViewGroup group) {
-            TextView DeviceName;
-            TextView DeviceAddr;
-            if(view == null) {
+            ViewInfoHolder infoHolder;
+            if (view == null) {
+                view = bInflater.inflate(R.layout.device_list, null);
+                infoHolder = new ViewInfoHolder();
+                infoHolder.deviceAddress = (TextView) view.findViewById(R.id.device_address);
+                infoHolder.deviceName = (TextView) view.findViewById(R.id.device_name);
+                view.setTag(infoHolder);
+            } else {
+                infoHolder = (ViewInfoHolder) view.getTag();
             }
+
+            BluetoothDevice device = bDeviceList.get(i);
+            final String deviceName = device.getName();
+            if(deviceName != null && deviceName.length() > 0) {
+                infoHolder.deviceName.setText(deviceName);
+            } else {
+                infoHolder.deviceName.setText("Unknown device.");
+                infoHolder.deviceAddress.setText(device.getAddress());
+            }
+            return view;
         }
     }
 
-    final ScanCallback bScanCallBack = new ScanCallback() {
-        @Override
-        public void onScanResult(int callbackType, ScanResult result) {
-            super.onScanResult(callbackType, result);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                }
-            });
-        }
-    };
+    private LEDeviceList deviceList;
+        final ScanCallback bScanCallBack = new ScanCallback() {
+            public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        deviceList.addDevice(device);
+                        deviceList.notifyDataSetChanged();
+                    }
+                });
+            }
+        };
+    static class ViewInfoHolder {
+        TextView deviceName;
+        TextView deviceAddress;
+    }
 }

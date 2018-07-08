@@ -21,6 +21,7 @@ import android.os.Handler;
 import android.app.ListActivity;
 import android.bluetooth.le.ScanCallback;
 
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;

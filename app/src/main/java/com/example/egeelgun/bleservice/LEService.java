@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Binder;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -32,14 +33,13 @@ public abstract class LEService extends Service {
     Activity active;
     private static final int PERMISSION_REQUEST_CODE = 1;
     public static int SDK_INT;
-    final BluetoothManager mManager = (BluetoothManager)
+    private BluetoothManager mManager = (BluetoothManager)
             getSystemService(Context.BLUETOOTH_SERVICE);
     private BluetoothAdapter blueAdapter = mManager.getAdapter();
     private final static String TAG = LEService.class.getSimpleName();
     private String blueDeviceAddr;
     private BluetoothGatt bGatt;
     private static int conState = 0; //State 0 = not connected, 1 = connecting, 2 = connected.
-
 
     public LEService(Activity active) {
         this.active = active;
@@ -66,6 +66,33 @@ public abstract class LEService extends Service {
                         }
                 });
             }
+        }
+    }
+
+    public class LocalBinder extends Binder {
+        LEService getService() {
+            return LEService.this;
+        }
+    }
+
+    public boolean active() {
+        if(mManager == null) {
+            mManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+            if(mManager == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean connect(String addr) {
+        if(blueAdapter == null || addr == null) {
+            Log.w(TAG, "Trying to use and existing connection.");
+            return false;
+        }
+
+        if(blueAdapter != null && addr.equals(blueDeviceAddr)) {
+
         }
     }
 

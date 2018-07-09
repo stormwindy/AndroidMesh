@@ -11,6 +11,7 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGatt;
@@ -103,6 +104,7 @@ public abstract class LEService extends Service {
             }
 
         }
+
         final BluetoothDevice device = blueAdapter.getRemoteDevice(addr);
         if (device == null) {
             Log.w(TAG, "No device has found.");
@@ -131,5 +133,40 @@ public abstract class LEService extends Service {
     //TODO: Implement a GATT Call Back Method. Check the code above.
     private static BluetoothGattCallback bCallBack() {
         return bCallBack();
+    }
+
+    private void broadcastUpdate(final String action) {
+        Intent intent = new Intent(action);
+        sendBroadcast(intent);
+    }
+
+    public void onServiceDiscover(BluetoothGatt gatt, int status) {
+        if(status == BluetoothGatt.GATT_SUCCESS) {
+            //TODO: BroadcastUpdate will be used when implemented.
+        }
+    }
+
+    public void disconnect () {
+        if (blueAdapter == null || bGatt == null) {
+            Log.w(TAG, "Bluetooth adapter is either not initialized or stopped working.");
+            return;
+        }
+        bGatt.disconnect();
+    }
+
+    public void close() {
+        if (bGatt == null) {
+            return;
+        }
+        bGatt.close();
+        bGatt = null;
+    }
+
+    public void readGATTCharacteristic(BluetoothGattCharacteristic characteristic) {
+        if (blueAdapter == null || bGatt == null) {
+            Log.w(TAG, "Bluetooth not initialized.");
+            return;
+        }
+        bGatt.readCharacteristic(characteristic);
     }
 }

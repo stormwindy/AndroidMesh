@@ -1,8 +1,3 @@
-/**
- * Author: Ege Elgun.
- * Data: 06.07.2018
- * All rights reserved: ICTerra Information and Communication Technologies Inc.
- */
 package com.example.egeelgun.bleservice;
 
 import android.Manifest;
@@ -31,6 +26,8 @@ import android.widget.Toast;
 
 import java.util.UUID;
 
+import static android.nfc.NfcAdapter.EXTRA_DATA;
+
 public abstract class LEService extends Service {
     Activity active;
     private static final int PERMISSION_REQUEST_CODE = 1;
@@ -42,6 +39,8 @@ public abstract class LEService extends Service {
     private String blueDeviceAddr;
     private BluetoothGatt bGatt;
     private static int conState = 0; //State 0 = not connected, 1 = connecting, 2 = connected.
+    public final static UUID UUID_HEART_RATE_MEASUREMENT =
+            UUID.fromString(GattAttributes.heartRate);
 
     public LEService(Activity active) {
         this.active = active;
@@ -165,8 +164,35 @@ public abstract class LEService extends Service {
         sendBroadcast(intent);
     }
 
-    private void broadcastUpdate(final String msg, final BluetoothGattCharacteristic characteristic) {
-        //TODO: Implement broadCast update for characteristic arugments.
+    private void broadcastUpdate(final String act, final BluetoothGattCharacteristic characteristic) {
+        //Used ready code because I have no idea how to use a parser.
+        //TODO: Understand what this code does.
+        final Intent intent = new Intent(act);
+
+        if (UUID_HEART_RATE_MEASUREMENT.equals(characteristic.getUuid())) {
+            int flag = characteristic.getProperties();
+            int format = -1;
+            if ((flag & 0x01) != 0) {
+                format = BluetoothGattCharacteristic.FORMAT_UINT16;
+                Log.d(TAG, "Heart rate format UINT16.");
+            } else {
+                format = BluetoothGattCharacteristic.FORMAT_UINT8;
+                Log.d(TAG, "Heart rate format UINT8.");
+            }
+            final int heartRate = characteristic.getIntValue(format, 1);
+            Log.d(TAG, String.format("Received heart rate: %d", heartRate));
+            intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
+        } else {
+            // For all other profiles, writes the data formatted in HEX.
+            final byte[] data = characteristic.getValue();
+            if (data != null && data.length > 0) {
+                final StringBuilder stringBuilder = new StringBuilder(data.length);
+                for(byte byteChar : data)
+                    stringBuilder.append(String.format("%02X ", byteChar));
+                intent.putExtra(EXTRA_DATA, new String(data) + "\n" + stringBuilder.toString());
+            }
+        }
+        sendBroadcast(intent);
     }
 
     public void onServiceDiscover(BluetoothGatt gatt, int status) {

@@ -110,34 +110,63 @@ public abstract class LEService extends Service {
             Log.w(TAG, "No device has found.");
             return false;
         }
-        bGatt = device.connectGatt(this, false, bCallBack());
+        bGatt = device.connectGatt(this, false, bCallBack);
         Log.d(TAG, "Attempting to create a new connection.");
         blueDeviceAddr = addr;
         conState = 1;
         return true;
     }
 
-/*    private static BluetoothGattCallback bCallBack = new BluetoothGattCallback() {
+    private final BluetoothGattCallback bCallBack = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            String intent;
-            if (newState == 2) {
-                intent = "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
-                conState = 2; //Change state to connected.
-                broadcastUpdate(intent);
+            String intentAct;
+            if(newState == 3) {
+                conState = 3;
+                intentAct = "com.example.egeelgun.bleservice.GATT_CONNECTED";
+                broadcastUpdate(intentAct);
+                Log.i(TAG, "Connection to GATT Service initialized");
+                Log.i(TAG, "Attempting to find GATT devices by discovering." +
+                        bGatt.discoverServices());
+            } else if (newState == 1) {
+                conState = 1;
+                intentAct = "com.example.egeelgun.bleservice.GATT_DISCONNECTED";
+                Log.i(TAG, "Disconnected from the GATT server");
+                broadcastUpdate(intentAct);
+            }
+        }
 
+        public void onServiceDiscovered(BluetoothGatt gatt, int status) {
+            if(status == BluetoothGatt.GATT_SUCCESS) {
+                broadcastUpdate("com.example.egeelgun.bleservice.GATT_DISCOVERED");
+            } else {
+                Log.w(TAG, "Service status" + status);
+            }
+        }
+
+        public void onCharacteristicRead(BluetoothGatt gatt,
+                                         final BluetoothGattCharacteristic charac, int status) {
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                broadcastUpdate("com.example.egeelgun.bleservice.DATA_AVAILABLE", charac);
+            }
+        }
+
+        public void inCharacteristicChange(BluetoothGatt gatt,
+                                           BluetoothGattCharacteristic characteristic, int status) {
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                broadcastUpdate("com.example.egeelgun.bleservice.DATA_AVAILABLE"
+                        + characteristic);
             }
         }
     };
-*/
-    //TODO: Implement a GATT Call Back Method. Check the code above.
-    private static BluetoothGattCallback bCallBack() {
-        return bCallBack();
-    }
 
     private void broadcastUpdate(final String action) {
         Intent intent = new Intent(action);
         sendBroadcast(intent);
+    }
+
+    private void broadcastUpdate(final String msg, final BluetoothGattCharacteristic characteristic) {
+        //TODO: Implement broadCast update for characteristic arugments.
     }
 
     public void onServiceDiscover(BluetoothGatt gatt, int status) {

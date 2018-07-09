@@ -125,7 +125,8 @@ public class LEScan extends ListActivity {
         }
     }
 
-    private LEDeviceList deviceList;
+    private LEDeviceList deviceList; //Creates a LEDeviceList Object to be used by ViewHolder.
+
         final ScanCallback bScanCallBack = new ScanCallback() {
             public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
                 runOnUiThread(new Runnable() {

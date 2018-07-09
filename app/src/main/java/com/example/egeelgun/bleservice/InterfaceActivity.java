@@ -12,6 +12,8 @@ public class InterfaceActivity extends Activity {
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDR = "DEVICE_ADDR";
 
+    private String bAddress;    //Address of the bluetoth device that will be used.
+
     private LEService bService;
 
     private final ServiceConnection bServiceConnection = new ServiceConnection() {
@@ -22,8 +24,7 @@ public class InterfaceActivity extends Activity {
                 Log.e(TAG, "Unable to start Bluetooth Service.");
                 finish();
             }
-
-            bService.conne
+            bService.connect(bAddress);
         }
 
         @Override

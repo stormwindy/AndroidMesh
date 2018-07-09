@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.Service;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGatt;
@@ -91,9 +92,27 @@ public abstract class LEService extends Service {
             return false;
         }
 
-        if(blueAdapter != null && addr.equals(blueDeviceAddr)) {
+        if((blueAdapter != null && blueDeviceAddr != null && addr.equals(blueDeviceAddr)
+                && bGatt != null)) {
+            Log.d(TAG, "Trying to connecto to an existing GATT device.");
+            if(bGatt.connect()) {
+                conState = 1;
+                return true;
+            } else {
+                return false;
+            }
 
         }
+        final BluetoothDevice device = blueAdapter.getRemoteDevice(addr);
+        if (device == null) {
+            Log.w(TAG, "No device has found.");
+            return false;
+        }
+        bGatt = device.connectGatt(this, false, bCallBack());
+        Log.d(TAG, "Attempting to create a new connection.");
+        blueDeviceAddr = addr;
+        conState = 1;
+        return true;
     }
 
 /*    private static BluetoothGattCallback bCallBack = new BluetoothGattCallback() {
@@ -109,4 +128,8 @@ public abstract class LEService extends Service {
         }
     };
 */
+    //TODO: Implement a GATT Call Back Method. Check the code above.
+    private static BluetoothGattCallback bCallBack() {
+        return bCallBack();
+    }
 }

@@ -12,6 +12,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
@@ -31,6 +32,7 @@ public class InterfaceActivity extends Activity {
     private LEService leService;
     private boolean bConnected;
     private TextView bConnectionState;
+    private TextView bDataField;
     private String bDeviceName;
     private String bDeviceAddr;
     private ExpandableListView bDeviceLiestview;
@@ -66,6 +68,12 @@ public class InterfaceActivity extends Activity {
     public void onPause() {
         super.onPause();
         unregisterReceiver(bleGattReciever); //TODO: Finish broadcastreciever.
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
+        unbindService(bServiceConnection);
+        leService = null;
     }
 
     private final ServiceConnection bServiceConnection = new ServiceConnection() {
@@ -117,17 +125,22 @@ public class InterfaceActivity extends Activity {
         });
     }
 
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //TODO: Create a menu xml file. Then complete the method.
+        return false;
+    }
+
     private ExpandableListView.OnChildClickListener devListCliclListener
             = new ExpandableListView.OnChildClickListener() {
         @Override
         public boolean onChildClick(ExpandableListView expandableListView,
                                     View view, int i, int i1, long l) {
-            //TODO: ADD CASE SCENARIOS.
+            //TODO: THIS MAY NOT WORK.
             if(bCharacteristics != null) {
                 BluetoothGattCharacteristic pivotCharacteristic = bCharacteristics.get(i).get(i1);
                 final int properties = pivotCharacteristic.getProperties();
 
-                if(properties > 0) {
+                if((properties | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
                     leService.readGATTCharacteristic(pivotCharacteristic);
                 }
                 return true;
@@ -196,5 +209,16 @@ public class InterfaceActivity extends Activity {
       intentFilter.addAction(LEService.GATT_CONNECTED);
       intentFilter.addAction(LEService.GATT_DISSCONNECTED);
       return intentFilter;
+    }
+
+    public void displayData(String data) {
+        if (data != null) {
+            bDataField.setText(data);
+        }
+    }
+
+    private void clearUI() {
+        bDeviceLiestview.setAdapter((SimpleExpandableListAdapter) null);
+        bDataField.setText(R.string.no_data);
     }
 }

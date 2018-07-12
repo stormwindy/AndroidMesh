@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -186,5 +187,14 @@ public class InterfaceActivity extends Activity {
                 bConnectionState.setText(resourceId);
             }
         });
+    }
+
+    public static IntentFilter filter() {
+      final IntentFilter intentFilter = new IntentFilter();
+      intentFilter.addAction(LEService.DATA_AVAILABLE);
+      intentFilter.addAction(LEService.GATT_DISCOVERED);
+      intentFilter.addAction(LEService.GATT_CONNECTED);
+      intentFilter.addAction(LEService.GATT_DISSCONNECTED);
+      return intentFilter;
     }
 }

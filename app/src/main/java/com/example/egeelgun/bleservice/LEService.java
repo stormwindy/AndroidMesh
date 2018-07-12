@@ -30,11 +30,10 @@ import static android.nfc.NfcAdapter.EXTRA_DATA;
 
 public abstract class LEService extends Service {
 
-    public final String GATT_CONNECTED = "com.example.egeelgun.bleservice.GATT_CONNECTED";
-    final String GATT_DISSCONNECTED = "com.example.egeelgun.bleservice.GATT_DISCONNECTED";
-    final String GATT_DISCOVERED = "com.example.egeelgun.bleservice.GATT_DISCOVERED";
-
-    final String DATA_AVAILABLE = "com.example.egeelgun.bleservice.DATA_AVAILABLE";
+    public final static String GATT_CONNECTED = "com.example.egeelgun.bleservice.GATT_CONNECTED";
+    public final static String GATT_DISSCONNECTED = "com.example.egeelgun.bleservice.GATT_DISCONNECTED";
+    public final static String GATT_DISCOVERED = "com.example.egeelgun.bleservice.GATT_DISCOVERED";
+    public final static String DATA_AVAILABLE = "com.example.egeelgun.bleservice.DATA_AVAILABLE";
 
     Activity active;
     private static final int PERMISSION_REQUEST_CODE = 1;

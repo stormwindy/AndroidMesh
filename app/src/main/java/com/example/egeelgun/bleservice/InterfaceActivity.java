@@ -93,17 +93,17 @@ public class InterfaceActivity extends Activity {
                 bConnected = true;
                 updateConnectionStateText(R.string.connected);
                 invalidateOptionsMenu();
-
             }
             if (leService.GATT_DISSCONNECTED.equals(action)) {
                 bConnected = false;
                 updateConnectionStateText(R.string.disconnected);
+                invalidateOptionsMenu();
             }
             if (leService.GATT_DISCOVERED.equals(action)) {
-                //TODO: Implement a function to display available GATT devices.
+                displayGATTServices(leService.servicesList());
             }
             if (leService.DATA_AVAILABLE.equals(action)) {
-                //TODO: Up TODO.
+                Log.i(TAG, "DATAA_AVAILABLE");
             }
         }
     };

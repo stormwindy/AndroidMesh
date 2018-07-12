@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -142,16 +143,40 @@ public class InterfaceActivity extends Activity {
         String unknownServices = getResources().getString(R.string.unknown_service);
         String unKnownCharacteristics = getResources().getString(R.string.unknown_characteristic);
         ArrayList<HashMap<String, String>> serviceInfo = new ArrayList<>();
-        ArrayList<Hashtable<String, String>> characInfo = new ArrayList<>();
+        ArrayList<ArrayList<HashMap<String, String>>> characInfo = new ArrayList<>();
         String unknownName = getResources().getString(R.string.unknown_service);
-        for(BluetoothGattService service : gattServices) {
+
+        for (BluetoothGattService service : gattServices) {
             HashMap<String, String> currServiceData = new HashMap<String, String>();
             uuid = service.getUuid().toString();
             currServiceData.put("NAME", GattAttributes.search(uuid, unknownName));
             currServiceData.put("UUID", uuid);
             serviceInfo.add(currServiceData);
+            ArrayList<HashMap<String, String>> gattCharacteristicGroupData =
+                    new ArrayList<>();
+            ArrayList<BluetoothGattCharacteristic> chars = new ArrayList<>();
+            for (BluetoothGattCharacteristic charas : bCharacteristics.get(0)) {
+                chars.add(charas);
+                HashMap<String, String> currCharData = new HashMap<>();
+                uuid = charas.getUuid().toString();
+                currCharData.put("UUIS", uuid);
+                gattCharacteristicGroupData.add(currCharData);
+            }
+            bCharacteristics.add(chars);
+            characInfo.add(gattCharacteristicGroupData);
         }
-        //TODO: Continue from here.
+        SimpleExpandableListAdapter gattServAdapter = new SimpleExpandableListAdapter(
+          this,
+          serviceInfo,
+          android.R.layout.simple_expandable_list_item_2,
+                new String[] {"NAME", "UUID"},
+                new int[] {android.R.id.text1, android.R.id.text2},
+                characInfo,
+                android.R.layout.simple_expandable_list_item_2,
+                new String[] {"NAME", "UUID"},
+                new int[] {android.R.id.text1, android.R.id.text2}
+        );
+        bDeviceLiestview.setAdapter(gattServAdapter);
     }
 
     public void updateState (final int resourceId){

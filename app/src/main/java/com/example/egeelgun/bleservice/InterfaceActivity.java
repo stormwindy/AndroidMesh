@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
@@ -58,7 +59,7 @@ public class InterfaceActivity extends Activity {
 
     public void onResume () {
         super.onResume();
-        //registerReceiver(bleGattReciever, X)  //TODO: Fill the function.
+        registerReceiver(bleGattReciever, filter());
         if(leService != null) {
             final boolean conResult = leService.connect(bDeviceAddr);
             Log.i(TAG, "Notification:" + conResult);
@@ -67,7 +68,7 @@ public class InterfaceActivity extends Activity {
 
     public void onPause() {
         super.onPause();
-        unregisterReceiver(bleGattReciever); //TODO: Finish broadcastreciever.
+        unregisterReceiver(bleGattReciever);
     }
 
     public void onDestroy() {
@@ -120,22 +121,43 @@ public class InterfaceActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                //TODO: Additional method implementation required for this method.
+                bConnectionState.setText(resourceID);
             }
         });
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        //TODO: Create a menu xml file. Then complete the method.
-        return false;
+        getMenuInflater().inflate(R.menu.gatt_services, menu);
+        if(bConnected) {
+            menu.findItem(R.id.menu_connect).setVisible(false);
+            menu.findItem(R.id.menu_disconnect).setVisible(true);
+        } else {
+            menu.findItem(R.id.menu_connect).setVisible(true);
+            menu.findItem(R.id.menu_disconnect).setVisible(false);
+        }
+        return true;
     }
 
+    public boolean onOptionItemSelect(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_connect:
+                leService.connect(bDeviceAddr);
+                return true;
+            case R.id.menu_disconnect:
+                leService.disconnect();
+                return true;
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return false;
+    }
     private ExpandableListView.OnChildClickListener devListCliclListener
             = new ExpandableListView.OnChildClickListener() {
         @Override
         public boolean onChildClick(ExpandableListView expandableListView,
                                     View view, int i, int i1, long l) {
-            //TODO: THIS MAY NOT WORK.
+            //WARNING - MAY NOT WORK.
             if(bCharacteristics != null) {
                 BluetoothGattCharacteristic pivotCharacteristic = bCharacteristics.get(i).get(i1);
                 final int properties = pivotCharacteristic.getProperties();

@@ -2,6 +2,7 @@ package com.example.egeelgun.bleservice;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -15,6 +16,9 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
 
 public class InterfaceActivity extends Activity {
     private final String TAG = InterfaceActivity.class.getSimpleName();
@@ -31,6 +35,7 @@ public class InterfaceActivity extends Activity {
     private ArrayList<ArrayList<BluetoothGattCharacteristic>> bCharacteristics =
             new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
     private BluetoothGattCharacteristic notifyCharacteristic;
+    private String uuid;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,6 +133,26 @@ public class InterfaceActivity extends Activity {
             return false;
         }
     };
+
+    public void displayGATTServices(List<BluetoothGattService> gattServices) {
+        if (gattServices == null) {
+            return;
+        }
+        String uuid;
+        String unknownServices = getResources().getString(R.string.unknown_service);
+        String unKnownCharacteristics = getResources().getString(R.string.unknown_characteristic);
+        ArrayList<HashMap<String, String>> serviceInfo = new ArrayList<>();
+        ArrayList<Hashtable<String, String>> characInfo = new ArrayList<>();
+        String unknownName = getResources().getString(R.string.unknown_service);
+        for(BluetoothGattService service : gattServices) {
+            HashMap<String, String> currServiceData = new HashMap<String, String>();
+            uuid = service.getUuid().toString();
+            currServiceData.put("NAME", GattAttributes.search(uuid, unknownName));
+            currServiceData.put("UUID", uuid);
+            serviceInfo.add(currServiceData);
+        }
+        //TODO: Continue from here.
+    }
 
     public void updateState (final int resourceId){
         runOnUiThread(new Runnable() {

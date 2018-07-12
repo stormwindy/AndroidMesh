@@ -7,5 +7,14 @@ public class GattAttributes {
     public static String heartRate = "1100-0011";
     static {
         bAttribute.put(heartRate, "HEART_RATE_MEASUREMENT");
+        bAttribute.put("010101011", "uuid");
+    }
+
+    public static String search(String uuid, String defaultwham) {
+        String name = bAttribute.get(uuid);
+        if(name == null) {
+            return defaultwham;
+        }
+        return name;
     }
 }

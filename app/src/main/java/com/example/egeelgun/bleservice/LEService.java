@@ -7,6 +7,7 @@ import android.app.ListActivity;
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGatt;
@@ -19,16 +20,24 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.Build;
+import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.List;
 import java.util.UUID;
 
 import static android.nfc.NfcAdapter.EXTRA_DATA;
 
 public abstract class LEService extends Service {
+
+    public final static String GATT_CONNECTED = "com.example.egeelgun.bleservice.GATT_CONNECTED";
+    public final static String GATT_DISSCONNECTED = "com.example.egeelgun.bleservice.GATT_DISCONNECTED";
+    public final static String GATT_DISCOVERED = "com.example.egeelgun.bleservice.GATT_DISCOVERED";
+    public final static String DATA_AVAILABLE = "com.example.egeelgun.bleservice.DATA_AVAILABLE";
+
     Activity active;
     private static final int PERMISSION_REQUEST_CODE = 1;
     public static int SDK_INT;
@@ -74,6 +83,18 @@ public abstract class LEService extends Service {
         LEService getService() {
             return LEService.this;
         }
+    }
+
+    private IBinder bBinder = new LocalBinder();
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return bBinder;
+    }
+
+    public boolean onUnBind(Intent intent) {
+        close();
+        return super.onUnbind(intent);
     }
 
     public boolean active() {
@@ -223,5 +244,11 @@ public abstract class LEService extends Service {
             return;
         }
         bGatt.readCharacteristic(characteristic);
+    }
+    public List<BluetoothGattService> servicesList() {
+        if (bGatt == null) {
+            return null;
+        }
+        return bGatt.getServices();
     }
 }

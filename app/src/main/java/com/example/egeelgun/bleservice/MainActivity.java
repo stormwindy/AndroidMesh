@@ -1,9 +1,3 @@
-/**
- * Author: Ege Elgun.
- * Data: 06.07.2018
- * All rights reserved: ICTerra Information and Communication Technologies Inc.
- */
-
 package com.example.egeelgun.bleservice;
 
 import android.content.pm.PackageManager;

@@ -199,7 +199,7 @@ public class InterfaceActivity extends Activity {
                 chars.add(charas);
                 HashMap<String, String> currCharData = new HashMap<>();
                 uuid = charas.getUuid().toString();
-                currCharData.put("UUIS", uuid);
+                currCharData.put("UUID", uuid);
                 gattCharacteristicGroupData.add(currCharData);
             }
             bCharacteristics.add(chars);

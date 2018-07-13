@@ -15,8 +15,6 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.app_name, Toast.LENGTH_SHORT).show();
             finish();
         }
-        LEScan scanner = new LEScan();
-        scanner.scanDevice(true);
 
     }
 

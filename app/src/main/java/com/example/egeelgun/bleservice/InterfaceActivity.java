@@ -42,6 +42,9 @@ public class InterfaceActivity extends Activity {
     private BluetoothGattCharacteristic notifyCharacteristic;
     private String uuid;
 
+    private ArrayList<ArrayList<HashMap<String, String>>> genCharacterInfo = new ArrayList<>();
+    private ArrayList<HashMap<String, String>> genServiceInfo = new ArrayList<>();
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gatt_service_characteristics);
@@ -57,10 +60,10 @@ public class InterfaceActivity extends Activity {
         bDeviceLiestview.setOnChildClickListener(devListCliclListener);
     }
 
-    public void onResume () {
+    public void onResume() {
         super.onResume();
         registerReceiver(bleGattReciever, filter());
-        if(leService != null) {
+        if (leService != null) {
             final boolean conResult = leService.connect(bDeviceAddr);
             Log.i(TAG, "Notification:" + conResult);
         }
@@ -117,7 +120,7 @@ public class InterfaceActivity extends Activity {
         }
     };
 
-    private void updateConnectionStateText (final int resourceID) {
+    private void updateConnectionStateText(final int resourceID) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -128,7 +131,7 @@ public class InterfaceActivity extends Activity {
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.gatt_services, menu);
-        if(bConnected) {
+        if (bConnected) {
             menu.findItem(R.id.menu_connect).setVisible(false);
             menu.findItem(R.id.menu_disconnect).setVisible(true);
         } else {
@@ -152,17 +155,18 @@ public class InterfaceActivity extends Activity {
         }
         return false;
     }
+
     private ExpandableListView.OnChildClickListener devListCliclListener
             = new ExpandableListView.OnChildClickListener() {
         @Override
         public boolean onChildClick(ExpandableListView expandableListView,
                                     View view, int i, int i1, long l) {
             //WARNING - MAY NOT WORK.
-            if(bCharacteristics != null) {
+            if (bCharacteristics != null) {
                 BluetoothGattCharacteristic pivotCharacteristic = bCharacteristics.get(i).get(i1);
                 final int properties = pivotCharacteristic.getProperties();
 
-                if((properties | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
+                if ((properties | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
                     leService.readGATTCharacteristic(pivotCharacteristic);
                 }
                 return true;
@@ -202,20 +206,30 @@ public class InterfaceActivity extends Activity {
             characInfo.add(gattCharacteristicGroupData);
         }
         SimpleExpandableListAdapter gattServAdapter = new SimpleExpandableListAdapter(
-          this,
-          serviceInfo,
-          android.R.layout.simple_expandable_list_item_2,
-                new String[] {"NAME", "UUID"},
-                new int[] {android.R.id.text1, android.R.id.text2},
+                this,
+                serviceInfo,
+                android.R.layout.simple_expandable_list_item_2,
+                new String[]{"NAME", "UUID"},
+                new int[]{android.R.id.text1, android.R.id.text2},
                 characInfo,
                 android.R.layout.simple_expandable_list_item_2,
-                new String[] {"NAME", "UUID"},
-                new int[] {android.R.id.text1, android.R.id.text2}
+                new String[]{"NAME", "UUID"},
+                new int[]{android.R.id.text1, android.R.id.text2}
         );
+        genServiceInfo = serviceInfo;
+        genCharacterInfo = characInfo;
         bDeviceLiestview.setAdapter(gattServAdapter);
     }
 
-    public void updateState (final int resourceId){
+    public ArrayList<HashMap<String, String>> getServiceInfo() {
+        return genServiceInfo;
+    }
+
+    public ArrayList<ArrayList<HashMap<String, String>>> getCharacterInfo() {
+        return genCharacterInfo;
+    }
+
+    public void updateState(final int resourceId) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -225,12 +239,12 @@ public class InterfaceActivity extends Activity {
     }
 
     public static IntentFilter filter() {
-      final IntentFilter intentFilter = new IntentFilter();
-      intentFilter.addAction(LEService.DATA_AVAILABLE);
-      intentFilter.addAction(LEService.GATT_DISCOVERED);
-      intentFilter.addAction(LEService.GATT_CONNECTED);
-      intentFilter.addAction(LEService.GATT_DISSCONNECTED);
-      return intentFilter;
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(LEService.DATA_AVAILABLE);
+        intentFilter.addAction(LEService.GATT_DISCOVERED);
+        intentFilter.addAction(LEService.GATT_CONNECTED);
+        intentFilter.addAction(LEService.GATT_DISSCONNECTED);
+        return intentFilter;
     }
 
     public void displayData(String data) {

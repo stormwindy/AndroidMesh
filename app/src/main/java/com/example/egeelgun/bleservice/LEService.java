@@ -115,7 +115,7 @@ public abstract class LEService extends Service {
 
         if((blueAdapter != null && blueDeviceAddr != null && addr.equals(blueDeviceAddr)
                 && bGatt != null)) {
-            Log.d(TAG, "Trying to connecto to an existing GATT device.");
+            Log.d(TAG, "Trying to connect to to an existing GATT device.");
             if(bGatt.connect()) {
                 conState = 1;
                 return true;

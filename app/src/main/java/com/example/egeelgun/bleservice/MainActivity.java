@@ -12,7 +12,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, R.string.app_name, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Android Mesh", Toast.LENGTH_SHORT).show();
             finish();
         }
 

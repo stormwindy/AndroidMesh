@@ -192,13 +192,15 @@ public class InterfaceActivity extends Activity {
             currServiceData.put("NAME", GattAttributes.search(uuid, unknownName));
             currServiceData.put("UUID", uuid);
             serviceInfo.add(currServiceData);
-            ArrayList<HashMap<String, String>> gattCharacteristicGroupData =
+            List<BluetoothGattCharacteristic> gattCharIt = service.getCharacteristics();
+            ArrayList<HashMap<String, String>> gattCharacteristicGroupData =    //UUID info of chars
                     new ArrayList<>();
-            ArrayList<BluetoothGattCharacteristic> chars = new ArrayList<>();
-            for (BluetoothGattCharacteristic charas : bCharacteristics.get(0)) {
+            ArrayList<BluetoothGattCharacteristic> chars = new ArrayList<>(); //Characteristics
+            for (BluetoothGattCharacteristic charas : gattCharIt) {
                 chars.add(charas);
                 HashMap<String, String> currCharData = new HashMap<>();
                 uuid = charas.getUuid().toString();
+                currCharData.put("UUID", GattAttributes.search(uuid, unKnownCharacteristics));
                 currCharData.put("UUID", uuid);
                 gattCharacteristicGroupData.add(currCharData);
             }
@@ -221,7 +223,11 @@ public class InterfaceActivity extends Activity {
         bDeviceLiestview.setAdapter(gattServAdapter);
     }
 
-    public ArrayList<HashMap<String, String>> getServiceInfo() {
+    public ArrayList<ArrayList<HashMap<String, String>>> getGenCharacterInfo() {
+        return genCharacterInfo;
+    }
+
+    public ArrayList<HashMap<String, String >> getGenServiceInfo() {
         return genServiceInfo;
     }
 

@@ -15,7 +15,6 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Android Mesh", Toast.LENGTH_SHORT).show();
             finish();
         }
-
     }
 
     protected void onResume(Bundle saveInstanceState) {

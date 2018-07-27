@@ -10,6 +10,7 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import org.apache.commons.lang3.BitField;
 
 public class NetworkPDU {
 
@@ -18,31 +19,32 @@ public class NetworkPDU {
         InterfaceActivity gattActivity = new InterfaceActivity();
         gattCharacteristics = gattActivity.getCharacterInfo();
     }
+    class generic_PDU {
+        BitSet IVI;
+        BitSet NID;
+        BitSet CTL;
+        BitSet TTL;
+        BitSet SQL;
+        BitSet SRC;
+        BitSet DST;
+        BitSet trnPDU;
+        BitSet netMIC;
 
-    class PDUMessage {
-        String IVIndex;
-        String NID;
-        String CTL;
-        String TTL;
-        String SEQ;
-        String SRC;
-        String DST;
-        String transportPDU;
-        String NetIMC;
-
-        public PDUMessage() {
-        }
-
-        public BitSet getConcatPDU() {
-            String strMessage = IVIndex + NID + CTL + TTL + SEQ + SRC + DST + transportPDU + NetIMC;
-            BitSet messagePDU = new BitSet(strMessage.length());
-            
-            for (int i = 0; i < strMessage.length(); i++) {
-                if (strMessage.charAt(i) == '1') {
-                    messagePDU.set(i);
-                }
+        public generic_PDU(boolean ctrl) {
+            IVI = new BitSet(1);
+            NID = new BitSet(7);
+            CTL = new BitSet(1);
+            TTL = new BitSet(7);
+            SQL = new BitSet(24);
+            SRC = new BitSet(16);
+            DST = new BitSet(16);
+            if(ctrl) {
+                CTL.set(0);
+                trnPDU = new BitSet(96);
+            } else {
+                trnPDU = new BitSet(128);
             }
-            return messagePDU;
         }
     }
+
 }

@@ -9,7 +9,7 @@ public class GattAttributes {
         bAttribute.put(heartRate, "HEART_RATE_MEASUREMENT");
         bAttribute.put("010101011", "uuid");
     }
-
+    //TODO: Create the packet structure.
     public static String search(String uuid, String defaultwham) {
         String name = bAttribute.get(uuid);
         if(name == null) {
